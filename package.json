@@ -1,0 +1,34 @@
+{
+  "name": "weddings",
+  "version": "1.0.0",
+  "description": "Simple weddings webpage for buying gifts",
+  "main": "src/index.js",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "config": "^1.26.1",
+    "js-yaml": "^3.8.4",
+    "koa": "^2.2.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-pug": "^3.0.0-2",
+    "koa-router": "^7.2.0",
+    "koa-unless": "^1.0.7",
+    "monk": "^6.0.0",
+    "pug": "^2.0.0-rc.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "LOG_LEVEL=debug npm run watch",
+    "watch": "supervisor -e js,pug,json,css -w ./src/ src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/desaroger/weddings.git"
+  },
+  "author": "Roger Fos Soler (desaroger23@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/desaroger/weddings/issues"
+  },
+  "homepage": "https://github.com/desaroger/weddings#readme"
+}

@@ -1,0 +1,6 @@
+port: 8080
+
+mongo: localhost/weddings
+
+cookiesKeys:
+  - 5dc5899ffee234b6089ab9ab855dfd7db531d5d8

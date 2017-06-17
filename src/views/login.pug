@@ -1,0 +1,21 @@
+extends ./common/layout
+
+block body
+    .container
+        .row
+            .col.m6.offset-m3.center-align
+                h2 Inicia sesión
+                p Introduce tu nombre de usuario y contraseña
+        .row
+            .col.s12.m4.offset-m4
+                form(method='post')
+                    +inputField('text', 'username', 'Nombre de usuario')
+                    +inputField('password', 'password', 'Contraseña')
+                    if (error)
+                        +alert('error')
+                            = 'Nombre de usuario o contraseña incorrectos'
+                    +button('Iniciar sesión')(type='submit')
+                    br
+                    br
+                    +link('No tengo cuenta', '/register')
+

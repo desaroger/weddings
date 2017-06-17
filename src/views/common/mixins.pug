@@ -1,0 +1,50 @@
+
+-
+    function uid() {
+        this.counter = this.counter || 0;
+        return 'uid-' + this.counter++;
+    }
+
+mixin inputField(type, name, label, options)
+    -
+        options = Object.assign({
+            id: uid()
+        }, options);
+
+    .input-field
+        input(type=type, name=name, id=options.id)&attributes(attributes)
+        label(for=options.id)= label
+
+
+mixin button(label)
+    button.waves-effect.waves-light.btn&attributes(attributes)= label
+
+mixin link(label, href)
+    a.waves-effect.waves-light.btn(href=href)&attributes(attributes)= label
+
+mixin routerLink(label)
+    router-link.waves-effect.waves-light.btn&attributes(attributes)= label
+
+
+mixin alert(type, title)
+    case type
+        when 'info'
+            .card-panel.blue.lighten-4.blue-text.text-darken-4
+                strong= title || ''
+                = ' '
+                block
+        when 'success'
+            .card-panel.green.lighten-4.green-text.text-darken-4
+                strong= title || 'Wooo!'
+                = ' '
+                block
+        when 'warning'
+            .card-panel.yellow.lighten-4.yellow-text.text-darken-4
+                strong= title || '¡Cuidado!'
+                = ' '
+                block
+        when 'error'
+            .card-panel.red.lighten-4.red-text.text-darken-4
+                strong= title || '¡Error!'
+                = ' '
+                block
