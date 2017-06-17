@@ -42,6 +42,9 @@ router
         } catch (error) {
             ctx.render('register', {error});
         }
+    })
+    .get('/admin', async ctx => {
+        ctx.render('admin/home');
     });
 
 

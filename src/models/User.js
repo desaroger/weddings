@@ -27,7 +27,7 @@ Object.assign(User, {
             throw new CustomError(`Email in use`, 401);
         }
         password = await this.hashPassword(password);
-        user = await this.insert({description, username, password});
+        user = await this.insert({description, username, password, admin: false});
 
         return await AccessToken.create(user._id);
     },
