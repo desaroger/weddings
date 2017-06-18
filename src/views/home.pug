@@ -1,11 +1,6 @@
 extends ./common/layout
 
-block body
-    .container
-        .row
-            .col.m6.offset-m3.center-align
-                h2 Hola #{user.username}!
-                p Peem
-        .row
-            .col.s12.m4.offset-m4
-                pre vamas
+block content
+    +header()
+    h2.title Hola #{user.username}!
+    p Blabla

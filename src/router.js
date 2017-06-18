@@ -1,6 +1,8 @@
 
+const _ = require('lodash');
 const KoaRouter = require('koa-router');
-const {User, AccessToken} = require('./models');
+const {CustomError} = require('./utils');
+const {Monk, User, Gift, Purchase, Preferences} = require('./models');
 
 let router = module.exports = KoaRouter();
 
@@ -25,6 +27,10 @@ router
             ctx.render('login', {error})
         }
     })
+    .get('/logout', async ctx => {
+        ctx.cookies.set('token', null, {signed: true});
+        ctx.redirect('/login');
+    })
     .get('/register', async ctx => {
         ctx.render('register');
     })
@@ -43,8 +49,89 @@ router
             ctx.render('register', {error});
         }
     })
+    .get('/gifts', async ctx => {
+        let gifts = await Gift.find();
+        ctx.render('gifts/list', {gifts});
+    })
+    .get('/gifts/:id', async ctx => {
+        let id = ctx.params.id;
+        let gift = id && await Gift.findOne({_id: id}) || null;
+        if (!gift) {
+            ctx.redirect('/gifts');
+        } else {
+            ctx.render('gifts/detail', {gift});
+        }
+    })
+    .get('/cart', async ctx => {
+        let purchases =  await Purchase.find({userId: ctx.state.user._id});
+        let giftIds = _.uniq(purchases.map(purchase => purchase.giftId));
+        let gifts = await Gift.find({_id: {$in: giftIds}});
+        let giftsMap = gifts.reduce((result, gift) => {
+            result[gift._id] = gift;
+            return result;
+        }, {});
+        for (let purchase of purchases) {
+            purchase.gift = giftsMap[purchase.giftId] || null;
+        }
+
+        ctx.render('gifts/cart', {
+            purchases,
+            preferences: Preferences.get()
+        });
+    })
+    .get('/addToCart', async ctx => {
+        let query = ctx.query;
+        query.giftId = Monk.id(query.giftId);
+        let gift = await Gift.findOne({_id: query.giftId});
+        if (!gift) {
+            throw new CustomError(`Unknown gift ${query.giftId}`);
+        }
+        let count = await Purchase.count({giftId: query.giftId});
+        let totalStock = gift.totalStock;
+        let availableStock = Math.max(0, totalStock - count);
+        if (availableStock) {
+            await Purchase.insert({
+                userId: ctx.state.user._id,
+                giftId: query.giftId,
+                quantity: query.quantity || 1,
+                createdAt: new Date()
+            });
+            await Gift.findOneAndUpdate({_id: gift._id}, {$set: {stock: availableStock - 1}});
+        }
+        ctx.redirect('back');
+    })
+    .get('/removeFromCart', async ctx => {
+        let query = ctx.query;
+        query.purchaseId = Monk.id(query.purchaseId);
+        let purchase = await Purchase.findOne({_id: query.purchaseId});
+        if (!purchase) {
+            throw new CustomError(`Unknown purchase ${query.purchaseId}`);
+        }
+        let gift = await Gift.findOne({_id: purchase.giftId});
+        if (!gift) {
+            throw new CustomError(`Unknown gift ${purchase.giftId} stored on purchase ${purchase._id}`);
+        }
+        await Purchase.findOneAndDelete({_id: query.purchaseId});
+        let count = await Purchase.count({giftId: gift._id});
+        let stock = gift.totalStock - count;
+        await Gift.findOneAndUpdate({_id: purchase.giftId}, {$set: {stock}});
+        ctx.redirect('back');
+    })
     .get('/admin', async ctx => {
         ctx.render('admin/home');
+    })
+    .get('/admin/gifts/new', async ctx => {
+        ctx.render('admin/createGift');
+    })
+    .post('/admin/gifts/new', async ctx => {
+        let data = ctx.request.body;
+        _.defaults(data, {
+            totalStock: 1
+        });
+        data.totalStock = parseInt(data.totalStock);
+        data.stock = data.totalStock;
+        let gift = await Gift.insert(data);
+        ctx.redirect(`/admin/gifts/new`);
     });
 
 

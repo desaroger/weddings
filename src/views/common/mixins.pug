@@ -11,10 +11,18 @@ mixin inputField(type, name, label, options)
             id: uid()
         }, options);
 
-    .input-field
-        input(type=type, name=name, id=options.id)&attributes(attributes)
-        label(for=options.id)= label
+    case type
+        when 'textarea'
+            .input-field
+                textarea.materialize-textarea(name=name, id=options.id)&attributes(attributes)
+                label(for=options.id)= label
+        default
+            .input-field
+                input(type=type, name=name, id=options.id)&attributes(attributes)
+                label(for=options.id)= label
 
+mixin icon(key)
+    i.material-icons= key
 
 mixin button(label)
     button.waves-effect.waves-light.btn&attributes(attributes)= label
@@ -25,7 +33,89 @@ mixin link(label, href)
 mixin routerLink(label)
     router-link.waves-effect.waves-light.btn&attributes(attributes)= label
 
+mixin cardWithImage(image)
+    .col.s12.m8.offset-m2.l6.offset-l3
+        .card-panel.grey.lighten-5.z-depth-1
+            .row.valign-wrapper
+                .col.s4.m2
+                    img.circle.responsive-img.valign(src=image)
+                .col.s8.m10
+                    block
 
+mixin cardWithImageTitle(title, image)
+    .card
+        .card-image
+            img(src=image)
+        .card-content
+            span.card-title= title
+            block
+
+mixin cardGift(gift, hideStock)
+    .col.m6
+        .card.gift
+            .card-image(style="background-image: url(" + gift.image + "); height: 250px; background-size: cover;")
+                //img(src=gift.image)
+                if gift.stock > 0
+                    -
+                        var href = '/addToCart?giftId=' + gift._id;
+                    a.btn-floating.halfway-fab.waves-effect.waves-light.red(href=href)
+                        +icon('add_shopping_cart')
+            .card-content
+                span.card-title= gift.name
+                = gift.description
+                .js-filler
+                div
+                    br
+                    if (!hideStock)
+                        p(style="float: left") Quedan #{gift.stock} disponibles (total #{gift.totalStock})
+                    p(style="float: right; font-size: 22px")= gift.price + ' €'
+                    br
+
+mixin cardPurchase(purchase)
+    - var gift = purchase.gift;
+    .col.m6
+        .card.purchase
+            .card-image
+                img(src=gift.image)
+                -
+                    var href = '/removeFromCart?purchaseId=' + purchase._id;
+                a.btn-floating.halfway-fab.waves-effect.waves-light.red(href=href)
+                    +icon('remove_shopping_cart')
+            .card-content
+                span.card-title= gift.name
+                = gift.description
+                .js-filler
+                div
+                    br
+                    p(style="float: right; font-size: 22px")= gift.price + ' €'
+                    br
+
+mixin header
+    .row
+        .col.s12
+            ul.header.hide-line
+                li.header-item: +headerA('/'): +icon('home')
+                li.header-item: +headerA('/gifts'): | Lista de regalos
+                li.header-item: +headerA('/cart'): | Tu lista
+                li.header-item: +headerA('/logout'): | Cerrar sesión
+                if (user.admin)
+                    li.header-item: a(href="/admin") Admin
+
+mixin headerAdmin
+    .row
+        .col.s12
+            ul.header.hide-line
+                li.header-item: a(href="/") Salir de admin
+                li.header-item: a(href="/admin/gifts/new") Añadir regalo
+
+mixin headerA(linkUrl)
+    -
+        var classes = '';
+        if (url == linkUrl) {
+            classes = 'active';
+        }
+    a(href=linkUrl, class=classes)
+        block
 mixin alert(type, title)
     case type
         when 'info'

@@ -1,0 +1,23 @@
+extends ../common/layout
+
+block content
+    +header()
+    .row
+        h2 Lista de regalos
+        br
+        each gift in gifts
+            if (gift.stock)
+                +cardGift(gift)
+    br
+    br
+    .row
+        h2 Regalos sin stock
+        br
+        each gift in gifts
+            if (!gift.stock)
+                +cardGift(gift, true)
+
+
+block javascript
+    script.
+        keepCardsSizes('.card.gift');

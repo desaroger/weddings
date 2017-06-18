@@ -1,0 +1,17 @@
+extends ../common/layout
+
+block content
+    +headerAdmin()
+    h2 Crear un regalo
+    p Introduce los datos del regalo
+    form(method='post')
+        +inputField('text', 'name', 'Nombre')
+        +inputField('textarea', 'description', 'Descripción')
+        +inputField('number', 'price', 'Precio (en euros)')
+        +inputField('number', 'totalStock', 'Stock')
+        +inputField('text', 'image', 'Url de la imagen')
+        if (error)
+            +alert('error')
+                = error.message
+        +button('Crear regalo')(type='submit')
+
