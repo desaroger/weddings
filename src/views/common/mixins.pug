@@ -100,7 +100,7 @@ mixin header
             ul.header.hide-line
                 li.header-item: +headerA('/'): +icon('home')
                 li.header-item: +headerA('/gifts'): | Lista de regalos
-                li.header-item: +headerA('/account'): | Tu cuenta
+                li.header-item: +headerA('/account'): | Mi cuenta
                 //li.header-item: +headerA('/logout'): | Cerrar sesión
                 if (user.admin)
                     li.header-item: a(href="/admin") Admin
