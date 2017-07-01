@@ -8,13 +8,14 @@ block content
     h2 Hola admin #{user.username}!
     p.flow-text Total recaudado: #{ total }€
     br
-    h3 Pagado por usuario
+    h3 Resumen por usuario
     ul
         each user in users
             li.flow-text -
                 = ' '
                 strong= user.username
-                span , #{user.description} (#{user.purchases.length} regalos): #{user.totalPaid}€
+                = ' '
+                span (#{user.description}): #{user.purchases.length} regalos, #{user.totalPaid}€
     br
     h3 Regalos por usuario
     - var count = 0;
@@ -23,7 +24,8 @@ block content
             - count++;
             h5
                 strong= user.username
-                span , #{user.description}
+                = ' '
+                span (#{user.description})
             ul
                 each purchase in purchases
                     li - #{purchase.quantity}x #{purchase.gift.name} - #{purchase.gift.price}€
