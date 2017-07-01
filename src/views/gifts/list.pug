@@ -4,22 +4,24 @@ block header
     title Lista de regalos - Abridme paso que me caso!
 
 block content
+    -
+        var giftsWithStock = gifts.filter(gift => gift.totalStock === false || gift.stock);
+        var giftsWithoutStock = gifts.filter(gift => gift.totalStock !== false && !gift.stock);
     +header()
     .row
         h2 Lista de regalos
         br
         p.flow-text Aquí puedes ver la lista completa de regalos. Utiliza el botón rojo que hay en cada regalo para añadirlo a tu carrito. Para ver tu carrito haz click en 'Mi cuenta', en el menu superior.
         br
-        each gift in gifts
-            if (gift.totalStock === false || gift.stock)
-                +cardGift(gift)
+        each gift in giftsWithStock
+            +cardGift(gift)
     br
     br
     .row
-        h2 Regalos sin stock
-        br
-        each gift in gifts
-            if (gift.totalStock !== false && !gift.stock)
+        if giftsWithoutStock.length
+            h2 Regalos sin stock
+            br
+            each gift in giftsWithoutStock
                 +cardGift(gift, true)
 
 
