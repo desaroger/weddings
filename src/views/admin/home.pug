@@ -3,4 +3,28 @@ extends ../common/layout
 block content
     +headerAdmin
     h2 Hola admin #{user.username}!
-    p Peem
+    p.flow-text Total recaudado: #{ total }€
+    br
+    h3 Pagado por usuario
+    ul
+        each user in users
+            li.flow-text -
+                = ' '
+                strong= user.username
+                span , #{user.description} (#{user.purchases.length} regalos): #{user.totalPaid}€
+    br
+    h3 Regalos por usuario
+    - var count = 0;
+    each user in users
+        if (user.purchases.length)
+            - count++;
+            h5
+                strong= user.username
+                span , #{user.description}
+            ul
+                each purchase in purchases
+                    li - #{purchase.quantity}x #{purchase.gift.name} - #{purchase.gift.price}€
+    if (!count)
+        p Ningún usuario ha elegido nada todavía
+    br
+    br

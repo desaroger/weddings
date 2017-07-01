@@ -55,7 +55,7 @@ mixin cardGift(gift, hideStock)
         .card.gift
             .card-image(style="background-image: url(" + gift.image + "); height: 250px; background-size: cover;")
                 //img(src=gift.image)
-                if gift.stock > 0
+                if gift.totalStock === false || gift.stock > 0
                     -
                         var href = '/addToCart?giftId=' + gift._id;
                     a.btn-floating.halfway-fab.waves-effect.waves-light.red(href=href)
@@ -67,7 +67,11 @@ mixin cardGift(gift, hideStock)
                 div
                     br
                     if (!hideStock)
-                        p(style="float: left") Quedan #{gift.stock} disponibles (total #{gift.totalStock})
+                        if (gift.totalStock !== false)
+                            p(style="float: left") Quedan #{gift.stock} disponibles (total #{gift.totalStock})
+                        else
+                            p(style="float: left") Infinitos! Se han comprado un total de #{gift.stock}
+
                     p(style="float: right; font-size: 22px")= gift.price + ' €'
                     br
 
@@ -96,8 +100,8 @@ mixin header
             ul.header.hide-line
                 li.header-item: +headerA('/'): +icon('home')
                 li.header-item: +headerA('/gifts'): | Lista de regalos
-                li.header-item: +headerA('/cart'): | Tu lista
-                li.header-item: +headerA('/logout'): | Cerrar sesión
+                li.header-item: +headerA('/account'): | Tu cuenta
+                //li.header-item: +headerA('/logout'): | Cerrar sesión
                 if (user.admin)
                     li.header-item: a(href="/admin") Admin
 
@@ -106,7 +110,7 @@ mixin headerAdmin
         .col.s12
             ul.header.hide-line
                 li.header-item: a(href="/") Salir de admin
-                li.header-item: a(href="/admin/gifts/new") Añadir regalo
+                //li.header-item: a(href="/admin/gifts/new") Añadir regalo
 
 mixin headerA(linkUrl)
     -

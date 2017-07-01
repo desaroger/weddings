@@ -1,17 +1,25 @@
-extends ../common/layout
+extends ./common/layout
 
 block content
     +header()
+    h2 Mi cuenta
+        div(style="display: inline-block; float:right")
+            a.waves-effect.waves-light.btn(href="/logout") Cerrar Sesión
+    p.flow-text Aquí podrás ver la forma de pagar los regalos. Utiliza el botón rojo que hay en el listado de tus regalos para quitarlo de la lista.
+    br
     h2 Resumen
     -
         var total = purchases.reduce(function(total, purchase) {
             return total + (purchase && purchase.gift && purchase.gift.price || 0);
         }, 0);
     p(style="font-size: 1.2em; margin-bottom: 0") Total a pagar:
+        = ' '
         strong(style="font-size: 1.5em") #{' ' + total} €
     p(style="font-size: 1.2em; margin-bottom: 0") Asunto a poner en la transferencia:
+        = ' '
         strong(style="font-size: 1.5em") #{user.username}
     p(style="font-size: 1.2em; margin-bottom: 0") Cuenta bancaria donde hacer la transferencia:
+        = ' '
         strong(style="font-size: 1.5em") #{preferences.accountNumber}
     br
     br
@@ -20,7 +28,10 @@ block content
     p Aquí puedes ver todos los regalos que tienes en la lista
     each purchase in purchases
         +cardPurchase(purchase)
-
+    if (!purchases.length)
+        strong (Aun no has elegido ningún regalo. Ves a la lista de regalos y elige los que quieras)
+    br
+    br
 
 
 block javascript

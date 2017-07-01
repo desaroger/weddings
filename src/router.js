@@ -53,16 +53,7 @@ router
         let gifts = await Gift.find();
         ctx.render('gifts/list', {gifts});
     })
-    .get('/gifts/:id', async ctx => {
-        let id = ctx.params.id;
-        let gift = id && await Gift.findOne({_id: id}) || null;
-        if (!gift) {
-            ctx.redirect('/gifts');
-        } else {
-            ctx.render('gifts/detail', {gift});
-        }
-    })
-    .get('/cart', async ctx => {
+    .get('/account', async ctx => {
         let purchases =  await Purchase.find({userId: ctx.state.user._id});
         let giftIds = _.uniq(purchases.map(purchase => purchase.giftId));
         let gifts = await Gift.find({_id: {$in: giftIds}});
@@ -74,7 +65,7 @@ router
             purchase.gift = giftsMap[purchase.giftId] || null;
         }
 
-        ctx.render('gifts/cart', {
+        ctx.render('account', {
             purchases,
             preferences: Preferences.get()
         });
@@ -88,16 +79,28 @@ router
         }
         let count = await Purchase.count({giftId: query.giftId});
         let totalStock = gift.totalStock;
-        let availableStock = Math.max(0, totalStock - count);
-        if (availableStock) {
+        if (totalStock === false) {
+            // Infinity stock
             await Purchase.insert({
                 userId: ctx.state.user._id,
                 giftId: query.giftId,
                 quantity: query.quantity || 1,
                 createdAt: new Date()
             });
-            await Gift.findOneAndUpdate({_id: gift._id}, {$set: {stock: availableStock - 1}});
+            await Gift.findOneAndUpdate({_id: gift._id}, {$set: {stock: count + 1}});
+        } else {
+            let availableStock = Math.max(0, totalStock - count);
+            if (availableStock) {
+                await Gift.findOneAndUpdate({_id: gift._id}, {$set: {stock: availableStock - 1}});
+                await Purchase.insert({
+                    userId: ctx.state.user._id,
+                    giftId: query.giftId,
+                    quantity: query.quantity || 1,
+                    createdAt: new Date()
+                });
+            }
         }
+
         ctx.redirect('back');
     })
     .get('/removeFromCart', async ctx => {
@@ -111,14 +114,42 @@ router
         if (!gift) {
             throw new CustomError(`Unknown gift ${purchase.giftId} stored on purchase ${purchase._id}`);
         }
-        await Purchase.findOneAndDelete({_id: query.purchaseId});
-        let count = await Purchase.count({giftId: gift._id});
-        let stock = gift.totalStock - count;
-        await Gift.findOneAndUpdate({_id: purchase.giftId}, {$set: {stock}});
+        if (gift.totalStock === false) {
+            // Infinity
+            await Purchase.findOneAndDelete({_id: query.purchaseId});
+            let stock = await Purchase.count({giftId: gift._id});
+            await Gift.findOneAndUpdate({_id: purchase.giftId}, {$set: {stock}});
+        } else {
+            await Purchase.findOneAndDelete({_id: query.purchaseId});
+            let count = await Purchase.count({giftId: gift._id});
+            let stock = gift.totalStock - count;
+            await Gift.findOneAndUpdate({_id: purchase.giftId}, {$set: {stock}});
+        }
+
         ctx.redirect('back');
     })
     .get('/admin', async ctx => {
-        ctx.render('admin/home');
+
+        // Get purchases populated
+        let purchases = await Purchase.find();
+        purchases = await Gift.populate(purchases);
+        let total = purchases.reduce((total, item) => {
+            return total + item.gift.price;
+        }, 0);
+        let users = await User.find();
+        users = users.map(user => {
+            user.purchases = purchases.filter(purchase => '' + purchase.userId == '' + user._id);
+            user.totalPaid = user.purchases.reduce((total, purchase) => {
+                return total + purchase.gift.price;
+            }, 0);
+            return user;
+        });
+        
+        ctx.render('admin/home', {
+            total,
+            users,
+            purchases
+        });
     })
     .get('/admin/gifts/new', async ctx => {
         ctx.render('admin/createGift');

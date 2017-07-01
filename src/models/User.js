@@ -44,6 +44,19 @@ Object.assign(User, {
         return user || null;
     },
 
+    async populate(array, key = 'userId') {
+        let userIds = array.map(item => item[key]);
+        let users = await this.find({_id: {$in: userIds}});
+        let usersMap = users.reduce((total, user) => {
+            total[user._id] = user;
+            return total;
+        }, {});
+        return array.map(item => {
+            item.user = usersMap[item[key]];
+            return item;
+        });
+    },
+
     async hashPassword(password) {
         return bcrypt.hash(password, 10);
     },

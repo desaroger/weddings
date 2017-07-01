@@ -2,5 +2,20 @@ extends ./common/layout
 
 block content
     +header()
-    h2.title Hola #{user.username}!
-    p Blabla
+    h2.title ¡Hola #{user.username}!
+    p.flow-text Utiliza el menu superior para moverte entre las secciones de la página.
+    br
+    h4 Lista de regalos
+    p.flow-text Podrás ver todos los regalos que hay disponibles y elegir cuáles quieres regalar
+    br
+    h4 Tu cuenta
+    p.flow-text Una vez hayas elegido lo que quieres regalar acude a 'Tu cuenta' para saber cómo pagar, quitar regalos de la lista, etc.
+    //ul.flow-text
+        li
+            strong - Lista de regalos
+            = ' '
+            span Podrás ver todos los regalos que hay disponibles y elegir cuáles quieres regalar
+        li
+            strong - Tu cuenta
+            = ' '
+            span Una vez hayas elegido lo que quieres regalar acude a 'Tu cuenta' para saber cómo pagar, quitar regalos de la lista, etc.
