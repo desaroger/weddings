@@ -50,6 +50,34 @@ mixin cardWithImageTitle(title, image)
             span.card-title= title
             block
 
+mixin cardComment(comment)
+    //.card
+        .card-content
+            span.card-title!= comment.content
+    li.card-comment.collection-item.avatar(style="min-height: auto")
+        img.circle(src=comment.user.avatar || "https://api.adorable.io/avatars/157/" + comment.user.username)
+        span.title(style="font-weight: bold")= comment.user.description
+        span.date(data-date=comment.createdAt.toISOString(), style="float:right")
+        p!= comment.content
+
+mixin pagination(current, total)
+    -
+        var isFirst = current == 0;
+        var isLast = current == total -1
+        var pages = [];
+        for (var i=0; i<total;i++) {
+            pages.push(i);
+        }
+    ul.pagination(style="float:right")
+        li(class=isFirst?'disabled':'waves-effect')
+            a(href=isFirst ? false : '?page=' + (current - 1)): i.material-icons chevron_left
+        each page in pages
+            li(class=page == current ? 'active' : 'waves-effect')
+                a(href=page != current ? ('?page=' + page) : false)= page + 1
+        li(class=isLast?'disabled':'waves-effect')
+            a(href=isLast ? false : '?page=' + (current + 1)): i.material-icons chevron_right
+
+
 mixin cardGift(gift, hideStock)
     .col.m6
         .card.gift
@@ -101,6 +129,7 @@ mixin header
                 li.header-item: +headerA('/'): +icon('home')
                 li.header-item: +headerA('/gifts'): | Lista de regalos
                 li.header-item: +headerA('/account'): | Mi cuenta
+                li.header-item: +headerA('/comments'): | Comentarios
                 //li.header-item: +headerA('/logout'): | Cerrar sesión
                 if (user.admin)
                     li.header-item: a(href="/admin") Admin
@@ -115,7 +144,7 @@ mixin headerAdmin
 mixin headerA(linkUrl)
     -
         var classes = '';
-        if (url == linkUrl) {
+        if (url.indexOf(linkUrl) == 0) {
             classes = 'active';
         }
     a(href=linkUrl, class=classes)

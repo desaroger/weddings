@@ -1,0 +1,39 @@
+extends ./common/layout
+
+block header
+    title Comentarios - Abridme paso que me caso!
+
+block content
+    +header()
+    h2.title Comentarios
+    p.flow-text Aquí puedes ver los comentarios que los invitados han publicado. Escribe tu también un comentario si quieres saludar, recomendar una canción para la boda, o ¡lo que se te ocurra!
+    form(method="POST")
+        +inputField('textarea', 'content', 'Mensaje')(required)
+        +button('Publicar comentario')(type='submit', style="float:right")
+    br
+    br
+    ul.collection
+        each comment in comments
+            +cardComment(comment)
+    +pagination(page, totalPages)
+
+block javascript
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/locale/es.js")
+    script.
+        $(document).ready(function () {
+            updateDates();
+            setInterval(function () {
+                updateDates();
+            }, 3000);
+        });
+
+        function updateDates() {
+            var dates = $('.card-comment .date');
+            dates.each(function () {
+                var date = $(this).data('date');
+                date = moment(date);
+                var fromNow = date.fromNow();
+                $(this).html(fromNow);
+            });
+        }

@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const KoaRouter = require('koa-router');
 const {CustomError} = require('./utils');
-const {Monk, User, Gift, Purchase, Preferences} = require('./models');
+const {Monk, User, Gift, Purchase, Preferences, Comment} = require('./models');
 
 let router = module.exports = KoaRouter();
 
@@ -127,6 +127,39 @@ router
         }
 
         ctx.redirect('back');
+    })
+    .get('/comments', async ctx => {
+        let page = parseInt(ctx.query.page || 0);
+        let pageSize = 10;
+        let options = {
+            skip: page * pageSize,
+            limit: pageSize,
+            sort: {createdAt: -1}
+        };
+
+        let comments = await Comment.find({}, options);
+        comments = await User.populate(comments);
+        comments = Comment.parseLinks(comments);
+        let count = await Comment.count();
+        let totalPages = Math.ceil(count / pageSize);
+
+        ctx.render('comments', {
+            comments,
+            count,
+            totalPages,
+            page
+        });
+    })
+    .post('/comments', async ctx => {
+        let data = ctx.request.body;
+        _.defaults(data, {
+            content: null
+        });
+        data.userId = ctx.state.user._id;
+        data.createdAt = new Date();
+
+        await Comment.insert(data);
+        ctx.redirect('/comments');
     })
     .get('/admin', async ctx => {
 

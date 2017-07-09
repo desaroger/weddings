@@ -6,5 +6,6 @@ module.exports = {
     AccessToken: require('./AccessToken'),
     Gift: require('./Gift'),
     Purchase: require('./Purchase'),
+    Comment: require('./Comment'),
     Preferences: require('./Preferences')
 };
