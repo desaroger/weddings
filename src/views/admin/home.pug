@@ -13,7 +13,7 @@ block content
         each user in users
             li.flow-text -
                 = ' '
-                strong= user.originalUsername
+                strong= user.username
                 = ' '
                 span (#{user.description}): #{user.purchases.length} regalos, #{user.totalPaid}€
     br
