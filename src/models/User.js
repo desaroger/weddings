@@ -1,5 +1,6 @@
 
 const db = require('./db');
+const slug = require('slug');
 const bcrypt = require('bcrypt');
 const AccessToken = require('./AccessToken');
 const {CustomError} = require('../utils');
@@ -9,7 +10,12 @@ User.createIndex('username', {unique: true});
 
 Object.assign(User, {
 
+    adaptUsername(username) {
+        return slug(username.toLowerCase());
+    },
+
     async login({username, password}) {
+        username = this.adaptUsername(username);
         let user = await this.findOne({username});
         if (!user) {
             throw new CustomError(`Email not found`, 401);
@@ -22,12 +28,13 @@ Object.assign(User, {
     },
 
     async register({description, username, password}) {
-        let user = await this.findOne({username});
+        let adaptedUsername = this.adaptUsername(username);
+        let user = await this.findOne({username: adaptedUsername});
         if (user) {
             throw new CustomError(`Email in use`, 401);
         }
         password = await this.hashPassword(password);
-        user = await this.insert({description, username, password, admin: false});
+        user = await this.insert({description, username: adaptedUsername, originalUsername: username, password, admin: false});
 
         return await AccessToken.create(user._id);
     },

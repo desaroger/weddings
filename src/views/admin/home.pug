@@ -5,7 +5,7 @@ block header
 
 block content
     +headerAdmin
-    h2 Hola admin #{user.username}!
+    h2 Hola admin #{user.originalUsername}!
     p.flow-text Total recaudado: #{ total }€
     br
     h3 Resumen por usuario
@@ -13,7 +13,7 @@ block content
         each user in users
             li.flow-text -
                 = ' '
-                strong= user.username
+                strong= user.originalUsername
                 = ' '
                 span (#{user.description}): #{user.purchases.length} regalos, #{user.totalPaid}€
     br
@@ -23,7 +23,7 @@ block content
         if (user.purchases.length)
             - count++;
             h5
-                strong= user.username
+                strong= user.originalUsername
                 = ' '
                 span (#{user.description})
             ul

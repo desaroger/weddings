@@ -15,7 +15,8 @@
     "koa-unless": "^1.0.7",
     "lodash": "^4.17.4",
     "monk": "^6.0.0",
-    "pug": "^2.0.0-rc.2"
+    "pug": "^2.0.0-rc.2",
+    "slug": "^0.9.1"
   },
   "devDependencies": {},
   "scripts": {
