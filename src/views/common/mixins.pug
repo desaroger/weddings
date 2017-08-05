@@ -144,7 +144,7 @@ mixin headerAdmin
 mixin headerA(linkUrl)
     -
         var classes = '';
-        if (url.indexOf(linkUrl) == 0) {
+        if (linkUrl == '/' ? url === linkUrl : url.indexOf(linkUrl) == 0) {
             classes = 'active';
         }
     a(href=linkUrl, class=classes)
