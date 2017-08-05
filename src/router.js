@@ -64,10 +64,11 @@ router
         for (let purchase of purchases) {
             purchase.gift = giftsMap[purchase.giftId] || null;
         }
+        let preferences = await Preferences.get();
 
         ctx.render('account', {
             purchases,
-            preferences: Preferences.get()
+            preferences
         });
     })
     .get('/addToCart', async ctx => {
