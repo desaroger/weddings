@@ -1,2 +1,2 @@
 # weddings
-Simple weddings webpage for buying gifts
+Simple weddings webpage for buying giftss
